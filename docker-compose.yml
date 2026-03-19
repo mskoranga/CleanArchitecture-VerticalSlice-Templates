@@ -1,0 +1,178 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:17-alpine
+    container_name: cleanarch-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: Book
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - cleanarch-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # .NET Application
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cleanarch-webapi
+    restart: unless-stopped
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__connection=Server=postgres;Port=5432;Database=Book;Username=postgres;Password=postgres;
+      - Serilog__Seq__ServerUrl=http://seq:5341
+      - Serilog__Loki__Uri=http://loki:3100
+      - OpenTelemetry__OtlpEndpoint=http://otel-collector:4317
+      - Kafka__BootstrapServers=kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cleanarch-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Seq - Log aggregation (Optional)
+  seq:
+    image: datalust/seq:latest
+    container_name: cleanarch-seq
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: Y
+    ports:
+      - "5341:80"
+    volumes:
+      - seq_data:/data
+    networks:
+      - cleanarch-network
+    profiles:
+      - observability
+
+  # Grafana Loki - Log aggregation (Optional)
+  loki:
+    image: grafana/loki:latest
+    container_name: cleanarch-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    networks:
+      - cleanarch-network
+    profiles:
+      - observability
+
+  # Grafana - Visualization (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cleanarch-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - cleanarch-network
+    profiles:
+      - observability
+
+  # OpenTelemetry Collector (Optional)
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: cleanarch-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Prometheus metrics
+    networks:
+      - cleanarch-network
+    profiles:
+      - observability
+
+  # Kafka (Optional)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: cleanarch-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - cleanarch-network
+    profiles:
+      - kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: cleanarch-kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - cleanarch-network
+    profiles:
+      - kafka
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:alpine
+    container_name: cleanarch-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cleanarch-network
+    profiles:
+      - cache
+
+networks:
+  cleanarch-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  seq_data:
+  loki_data:
+  grafana_data:
+  redis_data:

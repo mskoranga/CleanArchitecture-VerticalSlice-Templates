@@ -1,0 +1,26 @@
+# Docker-specific gitignore entries
+# Add these to your existing .gitignore
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Docker override file for local development
+docker-compose.override.yml
+
+# Docker volumes
+postgres_data/
+seq_data/
+loki_data/
+grafana_data/
+redis_data/
+
+# Database backups
+*.sql
+*.dump
+backup/
+
+# Logs
+logs/
+*.log

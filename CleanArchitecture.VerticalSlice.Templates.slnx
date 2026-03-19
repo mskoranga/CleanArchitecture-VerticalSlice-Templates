@@ -1,0 +1,72 @@
+<Solution>
+    <Folder Name="/src/">
+     <Project Path="src/Application/Application.csproj" />
+     <Project Path="src/Domain/Domain.csproj" />
+     <Project Path="src/Infrastructure/Infrastructure.csproj" />
+     <Project Path="src/WebApi/Apis.csproj" />
+    </Folder>
+
+    <Folder Name="/tests/" />
+    <Folder Name="/tests/integrationTests/" />
+    <Folder Name="/tests/unitTests/">
+     <Project Path="tests/unitTests/CleanArchitecture.VerticalSlice.Api.UnitTests/Apis.UnitTests.csproj" />
+     <Project Path="tests/unitTests/CleanArchitecture.VerticalSlice.Application.UnitTests/Application.UnitTests.csproj" />
+     <Project Path="tests/unitTests/CleanArchitecture.VerticalSlice.Domain.UnitTests/Domain.UnitTests.csproj" />
+     <Project Path="tests/unitTests/CleanArchitecture.VerticalSlice.Infrastructure.UnitTests/Infrastructure.UnitTests.csproj" />
+    </Folder>
+ <Folder Name="/docs/">
+  <File Path="CHECKLIST.md" />
+  <File Path="DOCKER-COMPLETE-GUIDE.md" />
+  <File Path="DOCKER-QUICK-REFERENCE.md" />
+  <File Path="DOCKER-README.md" />
+  <File Path="KAFKA_FEATURE_SUMMARY.md" />
+  <File Path="README.md" />
+ </Folder>
+
+ <Folder Name="/solutionItems/">
+     <Folder Name="/solutionItems/docker/">
+         <File Path="Dockerfile" />
+         <File Path="docker-compose.yml" />
+         <File Path=".dockerignore" />
+         <File Path=".env.template" />
+         <File Path="docker-compose.override.yml.example" />
+         <File Path="Makefile" />
+     </Folder>
+     <Folder Name="/solutionItems/dockerDocumentation/">
+         <File Path="DOCKER-COMPLETE-GUIDE.md" />
+         <File Path="DOCKER-QUICK-REFERENCE.md" />
+         <File Path="DOCKER-README.md" />
+     </Folder>
+     <Folder Name="/solutionItems/packageManagement/">
+         <File Path="Directory.Packages.props" />
+         <File Path="nuget.config" />
+     </Folder>
+     <Folder Name="/solutionItems/configuration/">
+         <File Path=".gitignore.docker" />
+     </Folder>
+     <Folder Name="/solutionItems/scripts/">
+         <File Path="scripts/init-db.sql" />
+         <File Path="scripts/start-docker.ps1" />
+         <File Path="scripts/stop-docker.ps1" />
+         <File Path="scripts/start-docker.sh" />
+     </Folder>
+     <Folder Name="/solutionItems/dockerConfig/">
+         <File Path="config/loki-config.yaml" />
+         <File Path="config/otel-collector-config.yaml" />
+     </Folder>
+  <File Path=".dockerignore" />
+  <File Path=".env.template" />
+  <File Path=".gitignore" />
+  <File Path=".gitignore.docker" />
+  <File Path="Directory.Packages.props" />
+  <File Path="DOCKER-COMPLETE-GUIDE.md" />
+  <File Path="docker-compose.override.yml.example" />
+  <File Path="docker-compose.yml" />
+  <File Path="DOCKER-QUICK-REFERENCE.md" />
+  <File Path="DOCKER-README.md" />
+  <File Path="Dockerfile" />
+  <File Path="Makefile" />
+  <File Path="nuget.config" />
+  <File Path="README.md" />
+ </Folder>
+</Solution>

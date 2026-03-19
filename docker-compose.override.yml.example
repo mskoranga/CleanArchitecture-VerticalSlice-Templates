@@ -1,0 +1,26 @@
+# Docker Compose override for local development
+# This file is automatically merged with docker-compose.yml
+# Use it for local development customizations
+
+version: '3.8'
+
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build  # Use build stage for faster iteration
+    volumes:
+      - ./src:/src/src:ro  # Mount source for hot reload (if configured)
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres  # Use weak password for dev only
