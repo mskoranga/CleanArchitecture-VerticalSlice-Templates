@@ -1,0 +1,172 @@
+{
+  "info": {
+    "name": "Kafka Messaging Feature",
+    "description": "Complete Postman collection for testing Kafka messaging endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "kafkaTopic",
+      "value": "test-topic",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Produce Schemaless Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"{{kafkaTopic}}\",\n  \"key\": \"user-123\",\n  \"payload\": {\n    \"action\": \"login\",\n    \"userId\": \"user-123\",\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"metadata\": {\n      \"ip\": \"192.168.1.1\",\n      \"device\": \"mobile\",\n      \"userAgent\": \"Mozilla/5.0\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/kafka/produce/schemaless",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "produce", "schemaless"]
+        },
+        "description": "Send a flexible schemaless message to Kafka. Useful for:\n- Event logging\n- User activity tracking\n- Analytics events\n- Dynamic payloads"
+      }
+    },
+    {
+      "name": "Produce Order Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"ORD-{{$randomInt}}\",\n  \"customerId\": \"CUST-{{$randomInt}}\",\n  \"totalAmount\": 299.99,\n  \"orderDate\": \"{{$isoTimestamp}}\",\n  \"status\": \"Pending\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/kafka/produce/order-event?topic=orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "produce", "order-event"],
+          "query": [
+            {
+              "key": "topic",
+              "value": "orders"
+            }
+          ]
+        },
+        "description": "Send a strongly-typed order event with schema validation. Valid statuses: Pending, Processing, Completed, Cancelled"
+      }
+    },
+    {
+      "name": "Produce User Registration Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"USR-{{$randomInt}}\",\n  \"email\": \"user{{$randomInt}}@example.com\",\n  \"name\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"registeredAt\": \"{{$isoTimestamp}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/kafka/produce/user-event?topic=user-registrations",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "produce", "user-event"],
+          "query": [
+            {
+              "key": "topic",
+              "value": "user-registrations"
+            }
+          ]
+        },
+        "description": "Send a strongly-typed user registration event with schema validation"
+      }
+    },
+    {
+      "name": "Consume Messages",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/kafka/consume/{{kafkaTopic}}?consumerGroupId=test-consumer-group&maxMessages=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "consume", "{{kafkaTopic}}"],
+          "query": [
+            {
+              "key": "consumerGroupId",
+              "value": "test-consumer-group"
+            },
+            {
+              "key": "maxMessages",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Consume messages from a Kafka topic. Max messages: 1-1000"
+      }
+    },
+    {
+      "name": "Invalid - Empty Topic",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"\",\n  \"key\": \"test-key\",\n  \"payload\": {\n    \"test\": \"value\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/kafka/produce/schemaless",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "produce", "schemaless"]
+        },
+        "description": "Test validation: Empty topic should return 400 Bad Request"
+      }
+    },
+    {
+      "name": "Invalid - Invalid Order Status",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"ORD-123\",\n  \"customerId\": \"CUST-456\",\n  \"totalAmount\": 99.99,\n  \"orderDate\": \"{{$isoTimestamp}}\",\n  \"status\": \"InvalidStatus\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/kafka/produce/order-event?topic=orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["kafka", "produce", "order-event"],
+          "query": [
+            {
+              "key": "topic",
+              "value": "orders"
+            }
+          ]
+        },
+        "description": "Test validation: Invalid status should return 400 Bad Request"
+      }
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "validBooks": [
+    {
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "isbn": "978-0132350884",
+      "price": 29.99,
+      "publishedYear": 2008
+    },
+    {
+      "title": "The Pragmatic Programmer",
+      "author": "David Thomas and Andrew Hunt",
+      "isbn": "978-0201616224",
+      "price": 39.99,
+      "publishedYear": 1999
+    },
+    {
+      "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+      "author": "Gang of Four",
+      "isbn": "978-0201633610",
+      "price": 54.99,
+      "publishedYear": 1994
+    },
+    {
+      "title": "Refactoring: Improving the Design of Existing Code",
+      "author": "Martin Fowler",
+      "isbn": "978-0201485677",
+      "price": 49.99,
+      "publishedYear": 1999
+    },
+    {
+      "title": "Domain-Driven Design: Tackling Complexity in the Heart of Software",
+      "author": "Eric Evans",
+      "isbn": "978-0321125217",
+      "price": 59.99,
+      "publishedYear": 2003
+    }
+  ],
+  "invalidBooks": [
+    {
+      "title": "",
+      "author": "Test Author",
+      "isbn": "123",
+      "price": 10.00,
+      "publishedYear": 2024,
+      "expectedError": "Title is required"
+    },
+    {
+      "title": "Test Book",
+      "author": "",
+      "isbn": "123",
+      "price": 10.00,
+      "publishedYear": 2024,
+      "expectedError": "Author is required"
+    },
+    {
+      "title": "Test Book",
+      "author": "Test Author",
+      "isbn": "",
+      "price": 10.00,
+      "publishedYear": 2024,
+      "expectedError": "ISBN is required"
+    },
+    {
+      "title": "Test Book",
+      "author": "Test Author",
+      "isbn": "123",
+      "price": 0,
+      "publishedYear": 2024,
+      "expectedError": "Price must be greater than 0"
+    },
+    {
+      "title": "Test Book",
+      "author": "Test Author",
+      "isbn": "123",
+      "price": -10.00,
+      "publishedYear": 2024,
+      "expectedError": "Price must be greater than 0"
+    },
+    {
+      "title": "Test Book",
+      "author": "Test Author",
+      "isbn": "123",
+      "price": 10.00,
+      "publishedYear": 999,
+      "expectedError": "Published year must be a valid year"
+    },
+    {
+      "title": "Test Book",
+      "author": "Test Author",
+      "isbn": "123",
+      "price": 10.00,
+      "publishedYear": 3000,
+      "expectedError": "Published year cannot be in the future"
+    }
+  ],
+  "edgeCases": [
+    {
+      "title": "A",
+      "author": "B",
+      "isbn": "1",
+      "price": 0.01,
+      "publishedYear": 1000,
+      "description": "Minimum valid values"
+    },
+    {
+      "title": "This is a very long book title that contains exactly two hundred characters to test the maximum length validation rule for the title field in the create book request validation",
+      "author": "This is a very long author name that contains exactly one hundred characters for testing purposes",
+      "isbn": "978-0-13-235088-4-EXTENDED",
+      "price": 9999.99,
+      "publishedYear": 2024,
+      "description": "Maximum valid values"
+    }
+  ]
+}
